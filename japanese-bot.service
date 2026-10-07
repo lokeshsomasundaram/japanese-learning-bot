@@ -1,0 +1,13 @@
+[Unit]
+Description=Japanese Learning Bot
+After=network.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/japanese-learning-bot
+ExecStart=/home/ubuntu/japanese-learning-bot/venv/bin/uvicorn main:app --host 127.0.0.1 --port 8000
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
