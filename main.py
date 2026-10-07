@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from .quiz import get_random_question
+from quiz import get_random_question
 
 app = FastAPI()
 
