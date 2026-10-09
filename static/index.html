@@ -1,0 +1,143 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日本語 | Japanese Learning Bot</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #fff5f7;
+            color: #292338;
+        }
+        header {
+            background: #d93662;
+            color: white;
+            padding: 22px;
+            text-align: center;
+        }
+        main {
+            max-width: 600px;
+            margin: 35px auto;
+            padding: 25px;
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 5px 25px #00000010;
+        }
+        .subtitle { color: #766b7c; }
+        .character {
+            font-size: 76px;
+            text-align: center;
+            margin: 25px 0;
+        }
+        #options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        button {
+            padding: 15px;
+            border: 1px solid #eadde3;
+            border-radius: 10px;
+            background: white;
+            font-size: 17px;
+            cursor: pointer;
+        }
+        button:hover { background: #fff0f4; }
+        button:disabled { cursor: default; }
+        #feedback {
+            min-height: 28px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .primary {
+            background: #d93662;
+            color: white;
+            border: none;
+            width: 100%;
+        }
+        .score { text-align: right; color: #d93662; }
+    </style>
+</head>
+<body>
+<header>
+    <h1>🇯🇵 日本語 Japanese Learning Bot</h1>
+    <p>Learn Japanese, one character at a time.</p>
+</header>
+
+<main>
+    <p class="subtitle">Hiragana Practice</p>
+    <p id="progress">Question ready</p>
+    <p class="score" id="score">Score: 0</p>
+
+    <div class="character" id="character">あ</div>
+    <h3 id="question">Loading question...</h3>
+
+    <div id="options"></div>
+    <p id="feedback" aria-live="polite"></p>
+    <button class="primary" id="next" onclick="loadQuestion()" disabled>
+        Next Question →
+    </button>
+</main>
+
+<script>
+let currentAnswer = "";
+let score = 0;
+let answered = false;
+let questionNumber = 0;
+
+async function loadQuestion() {
+    const response = await fetch("/quiz");
+    const data = await response.json();
+
+    currentAnswer = data.answer;
+    answered = false;
+    questionNumber++;
+
+    document.getElementById("question").textContent = data.question;
+    document.getElementById("character").textContent =
+        data.question.replace("What is ", "").replace("?", "");
+    document.getElementById("progress").textContent =
+        "Question " + questionNumber;
+    document.getElementById("feedback").textContent = "";
+    document.getElementById("next").disabled = true;
+
+    const options = document.getElementById("options");
+    options.innerHTML = "";
+
+    data.options.forEach(option => {
+        const button = document.createElement("button");
+        button.textContent = option;
+        button.onclick = () => checkAnswer(option, button);
+        options.appendChild(button);
+    });
+}
+
+function checkAnswer(answer, button) {
+    if (answered) return;
+    answered = true;
+
+    if (answer === currentAnswer) {
+        score++;
+        document.getElementById("feedback").textContent =
+            "✅ Correct! よくできました！";
+    } else {
+        document.getElementById("feedback").textContent =
+            "❌ Correct answer: " + currentAnswer;
+    }
+
+    document.getElementById("score").textContent = "Score: " + score;
+    document.querySelectorAll("#options button").forEach(b => {
+        b.disabled = true;
+    });
+    document.getElementById("next").disabled = false;
+}
+
+loadQuestion();
+</script>
+</body>
+</html>
+```
